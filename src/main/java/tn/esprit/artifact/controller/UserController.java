@@ -5,8 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.artifact.entity.User;
+import tn.esprit.artifact.enums.Role;
 import tn.esprit.artifact.service.UserService;
 
 import java.util.HashMap;
@@ -20,7 +22,9 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/user")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> addUser(@RequestBody User user) {
+        user.setRole(Role.AGENT);
         User addedUser = userService.createUser(user);
         return new ResponseEntity<>(addedUser, HttpStatus.CREATED);
     }

@@ -1,5 +1,6 @@
 package tn.esprit.artifact.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,13 +21,14 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 @ToString
+@JsonIgnoreProperties({"authorities"})
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String email;
-    private Long number;
+    private String number;
     private String firstname;
     private String lastname;
     private String password;

@@ -1,5 +1,6 @@
 package tn.esprit.artifact.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -16,12 +17,16 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/user")
 public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping("/user")
+    @PostMapping("")
+    @Operation(
+            summary = "Create a new Agent",
+            description = "Adds a new user with the role AGENT. Only accessible to ADMIN users."
+    )
 //    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> addUser(@RequestBody User user) {
         user.setRole(Role.AGENT);
@@ -29,23 +34,17 @@ public class UserController {
         return new ResponseEntity<>(addedUser, HttpStatus.CREATED);
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<User> showUserByid(@PathVariable Long userId) {
-        User user = userService.getUserById(userId);
-        if (user != null) {
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
 
-    @GetMapping("/user")
+
+    @GetMapping("")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
-    @PutMapping("/user/{userId}")
+
+
+    @PutMapping("/{userId}")
     public ResponseEntity<User> updateUser(@PathVariable("userId") Long userId, @RequestBody User updatedUser) {
         try {
             User updated = userService.updateUser(userId, updatedUser);
@@ -57,7 +56,7 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/user/{userId}")
+    @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         try {
             User deletedUser = userService.deleteUser(userId);
@@ -79,11 +78,7 @@ public class UserController {
 
 
 
-    @GetMapping("/user/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "Logout successful";
-    }
+
 
 
 

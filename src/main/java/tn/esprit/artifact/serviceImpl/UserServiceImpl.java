@@ -1,10 +1,12 @@
 package tn.esprit.artifact.serviceImpl;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tn.esprit.artifact.entity.*;
+import tn.esprit.artifact.enums.Role;
 import tn.esprit.artifact.repository.ContractRepository;
 import tn.esprit.artifact.repository.UserRepository;
 import tn.esprit.artifact.service.UserService;
@@ -30,55 +32,43 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(Long id, User user) {
-        Optional<User> optionalUser = userRepository.findById(id);
+        return userRepository.findById(id).map(existingUser -> {
 
-        if (optionalUser.isPresent()) {
-            User existingUser = optionalUser.get();
-
-            // Update fields only if they are not null
-
-            if (user.getPassword() != null) {
+            // Update only the provided fields
+            if (user.getPassword() != null && !user.getPassword().isBlank()) {
                 existingUser.setPassword(user.getPassword());
             }
-            if (user.getEmail() != null) {
+
+            if (user.getEmail() != null && !user.getEmail().isBlank()) {
                 existingUser.setEmail(user.getEmail());
             }
-            if (user.getNumber() != null) {
+
+            if (user.getNumber() != null && !user.getNumber().isBlank()) {
                 existingUser.setNumber(user.getNumber());
             }
-            if (user.getFirstname() != null) {
+
+            if (user.getFirstname() != null && !user.getFirstname().isBlank()) {
                 existingUser.setFirstname(user.getFirstname());
             }
-            if (user.getLastname() != null) {
+
+            if (user.getLastname() != null && !user.getLastname().isBlank()) {
                 existingUser.setLastname(user.getLastname());
             }
-//            if (user.getType() != null) {
-//                existingUser.setType(user.getType());
-//            }
 
             if (user.getContracts() != null) {
                 existingUser.setContracts(user.getContracts());
-            }else{
-                existingUser.setContracts(new HashSet<>());
             }
 
+            // If you plan to support updating role/type/service later, uncomment/update those here.
+            // Example:
+             if (user.getRole() != null) {
+                 existingUser.setRole(user.getRole());
+             }
 
-
-           /* if (user.getChefEquipeService() != null) {
-                existingUser.setChefEquipeService(user.getChefEquipeService());
-            }else{
-                existingUser.setServiceEq(null);
-
-            }*/
-
-
-            // Save the updated user entity
             return userRepository.save(existingUser);
-        } else {
-            // Handle the case where the user with the given ID is not found
-            throw new IllegalArgumentException("User not found with ID: " + id);
-        }
+        }).orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
     }
+
 
 
     @Override
@@ -90,6 +80,7 @@ public class UserServiceImpl implements UserService {
         }
         return usersList;
     }
+
 
     @Override
     public User getUserById(Long id) {
